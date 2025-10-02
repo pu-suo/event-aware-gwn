@@ -1,0 +1,25 @@
+# Python virtual environment
+env/
+venv/
+__pycache__/
+
+# Large data files and generated features
+# These should be downloaded separately by the user
+data/*.csv
+data/*.pkl
+data/*.npz
+
+# Logs and trained models
+# These are generated during training and should not be version controlled
+logs/
+*.pth
+
+# IDE and OS specific files
+.vscode/
+.idea/
+.DS_Store
+
+# Python build artifacts
+*.pyc
+*.pyo
+*.pyd
