@@ -17,17 +17,17 @@ def calculate_metrics(preds, labels, horizons):
     """
     Calculate and print MAE, RMSE, and MAPE for given prediction horizons.
     """
-    mae = masked_mae_loss(preds, labels, null_val=0.0)
-    rmse = masked_rmse_loss(preds, labels, null_val=0.0)
-    mape = masked_mape_loss(preds, labels, null_val=0.0)
+    mae = masked_mae_loss(preds, labels)
+    rmse = masked_rmse_loss(preds, labels)
+    mape = masked_mape_loss(preds, labels)
     print(f"Overall Metrics | MAE: {mae:.4f}, RMSE: {rmse:.4f}, MAPE: {mape:.4f}")
 
     for i in horizons:
         pred_h = preds[:, i, :]
         label_h = labels[:, i, :]
-        mae_h = masked_mae_loss(pred_h, label_h, null_val=0.0)
-        rmse_h = masked_rmse_loss(pred_h, label_h, null_val=0.0)
-        mape_h = masked_mape_loss(pred_h, label_h, null_val=0.0)
+        mae_h = masked_mae_loss(pred_h, label_h)
+        rmse_h = masked_rmse_loss(pred_h, label_h)
+        mape_h = masked_mape_loss(pred_h, label_h)
         print(f"Horizon {((i + 1) * 5):>2} min | MAE: {mae_h:.4f}, RMSE: {rmse_h:.4f}, MAPE: {mape_h:.4f}")
 
 def main(args):
@@ -122,31 +122,38 @@ def main(args):
     # --- Event-Specific Evaluation ---
     print("\n--- Event-Specific Test Set Performance ---")
     # Load event data to identify event windows
-    events_df = pd.read_csv(os.path.join(config['data']['dataset_dir'], 'events.csv'))
-    events_df['event_start'] = pd.to_datetime(events_df['event_start'])
-    
-    # Get the timestamps corresponding to our test set predictions
-    test_timestamps = dataloaders['test'].dataset.timestamps
-    
-    event_indices = []
-    for i, ts in enumerate(test_timestamps):
-        ts_datetime = pd.to_datetime(ts)
-        for _, event in events_df.iterrows():
-            # Define event window: 3 hours before to 4 hours after start
-            window_start = event['event_start'] - pd.Timedelta(hours=3)
-            window_end = event['event_start'] + pd.Timedelta(hours=4)
-            if window_start <= ts_datetime <= window_end:
-                event_indices.append(i)
-                break # Move to the next timestamp once it's marked as part of an event
+    try:
+        events_df = pd.read_csv(os.path.join(config['data']['dataset_dir'], 'events.csv'))
+        events_df['event_start'] = pd.to_datetime(events_df['event_start'])
+    except FileNotFoundError:
+        print("Warning: events.csv not found. Skipping event-specific evaluation.")
+        events_df = None
 
-    if not event_indices:
-        print("No event windows found in the test set. Skipping event-specific evaluation.")
+    # This part requires the timestamps to be available from the dataloader's dataset object
+    if events_df is not None and hasattr(dataloaders['test'].dataset, 'timestamps'):
+        test_timestamps = dataloaders['test'].dataset.timestamps
+        
+        event_indices = []
+        for i, ts in enumerate(test_timestamps):
+            ts_datetime = pd.to_datetime(ts)
+            for _, event in events_df.iterrows():
+                # Define event window: 3 hours before to 4 hours after start
+                window_start = event['event_start'] - pd.Timedelta(hours=3)
+                window_end = event['event_start'] + pd.Timedelta(hours=4)
+                if window_start <= ts_datetime <= window_end:
+                    event_indices.append(i)
+                    break # Move to the next timestamp once it's marked as part of an event
+
+        if not event_indices:
+            print("No event windows found in the test set. Skipping event-specific evaluation.")
+        else:
+            # Filter predictions and labels for event windows
+            event_predictions = predictions_rescaled[event_indices]
+            event_labels = labels_rescaled[event_indices]
+            print(f"Found {len(event_indices)} time steps within event windows.")
+            calculate_metrics(event_predictions, event_labels, horizons_to_eval)
     else:
-        # Filter predictions and labels for event windows
-        event_predictions = predictions_rescaled[event_indices]
-        event_labels = labels_rescaled[event_indices]
-        print(f"Found {len(event_indices)} time steps within event windows.")
-        calculate_metrics(event_predictions, event_labels, horizons_to_eval)
+        print("Warning: Timestamps not found in test dataset or events.csv not found. Skipping event-specific evaluation.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Evaluate the Event-Aware Graph WaveNet model.")

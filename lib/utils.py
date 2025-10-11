@@ -134,13 +134,13 @@ def load_dataset(dataset_dir, batch_size, seq_length=12, horizon=12, test_batch_
 
     # Create TensorDatasets and DataLoaders
     train_dataset = TensorDataset(x_train, x_train_events, y_train)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
 
     val_dataset = TensorDataset(x_val, x_val_events, y_val)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
     
     test_dataset = TensorDataset(x_test, x_test_events, y_test)
-    test_loader = DataLoader(test_dataset, batch_size=test_batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=test_batch_size, shuffle=False, num_workers=0, pin_memory=True)
 
     dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
     

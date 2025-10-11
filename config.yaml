@@ -19,7 +19,7 @@ model:
 
 # Training configuration
 train:
-  epochs: 10
+  epochs: 100
   base_lr: 0.001
   weight_decay: 0.0001
   lr_patience: 5

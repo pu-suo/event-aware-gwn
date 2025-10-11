@@ -89,6 +89,8 @@ def main(args):
         os.makedirs(config['train']['log_dir'])
     
     best_val_loss = float('inf')
+    patience = 5
+    patience_counter = 0
     
     # --- Training and Validation Loop ---
     print("Starting training...")
@@ -152,9 +154,17 @@ def main(args):
 
         if val_loss < best_val_loss:
             best_val_loss = val_loss
+            patience_counter = 0
             save_path = os.path.join(config['train']['log_dir'], 'best_model.pth')
             torch.save(model.state_dict(), save_path)
-            print(f"Validation loss improved. Model saved to {save_path}")
+            print(f"Validation loss improved to {best_val_loss:.4f}. Model saved to {save_path}")
+        else:
+            patience_counter += 1
+            print(f"Validation loss did not improve. Patience: {patience_counter}/{patience}")
+
+        if patience_counter >= patience:
+            print("Early stopping triggered. Training finished.")
+            break
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -162,4 +172,3 @@ if __name__ == '__main__':
                         help='Configuration filename for training the model.')
     args = parser.parse_args()
     main(args)
-
