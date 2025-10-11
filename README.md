@@ -6,6 +6,10 @@ The project introduces a novel Graph Neural Network architecture designed to imp
 
 ---
 
+## Datasets
+
+Data for this project available at the following Google Drive: [PEMS_Events](https://drive.google.com/drive/folders/1V3lT6yadOIGauxszsDLG2NcOslH8_6-z?usp=sharing)
+
 ## Acknowledgments and Citations
 
 This work is built upon the foundational concepts of several key research papers and datasets. We gratefully acknowledge the authors and data providers for their significant contributions.
