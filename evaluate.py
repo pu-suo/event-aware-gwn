@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-# Make sure to place the 'lib' and 'model' directories in the python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from lib.utils import load_dataset, load_graph_data, masked_mae_loss, masked_rmse_loss, masked_mape_loss
@@ -42,7 +41,6 @@ def main(args):
         print(f"Error: Configuration file not found at '{args.config_filename}'")
         sys.exit(1)
 
-    # Updated device selection logic
     if torch.backends.mps.is_available():
         device = torch.device("mps")
     elif torch.cuda.is_available():
@@ -123,13 +121,12 @@ def main(args):
     print("\n--- Event-Specific Test Set Performance ---")
     # Load event data to identify event windows
     try:
-        events_df = pd.read_csv(os.path.join(config['data']['dataset_dir'], 'events.csv'))
+        events_df = pd.read_csv(os.path.join(config['data']['dataset_dir'], 'pems_events.csv'))
         events_df['event_start'] = pd.to_datetime(events_df['event_start'])
     except FileNotFoundError:
         print("Warning: events.csv not found. Skipping event-specific evaluation.")
         events_df = None
 
-    # This part requires the timestamps to be available from the dataloader's dataset object
     if events_df is not None and hasattr(dataloaders['test'].dataset, 'timestamps'):
         test_timestamps = dataloaders['test'].dataset.timestamps
         
