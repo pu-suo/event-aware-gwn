@@ -1,8 +1,8 @@
 # Event-Aware Graph WaveNet for Traffic Forecasting
 
-This repository contains the PyTorch implementation for the research project "Dynamic Event-Influence Modeling for Traffic Forecasting using Attention-Modulated Graph WaveNet".
+This repository contains the PyTorch implementation for the research project "Dynamic Event-Influence Modeling for Traffic Forecasting using Attention Modulated Graph WaveNet".
 
-The project introduces a novel Graph Neural Network architecture designed to improve traffic forecasting, particularly for non-recurrent congestion caused by events like sports games or concerts. The core innovation is a **Dynamic Graph Attention (DGA)** module, which uses cross-attention to learn an event-driven relational bias. This allows the model to explicitly and dynamically adjust its understanding of the spatial relationships between traffic sensors in real-time based on external event data.
+The project introduces a novel Graph Neural Network architecture designed to improve traffic forecasting, particularly for non recurrent congestion caused by events like sports games or concerts. The core innovation is a **Dynamic Graph Attention (DGA)** module, which uses cross attention to learn an event driven relational bias. This allows the model to explicitly and dynamically adjust its understanding of the spatial relationships between traffic sensors in real time based on external event data.
 
 ---
 
